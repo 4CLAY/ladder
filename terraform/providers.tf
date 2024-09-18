@@ -2,13 +2,9 @@ terraform {
   required_version = ">=0.12"
 
   required_providers {
-    azapi = {
-      source  = "azure/azapi"
-      version = "~>1.5"
-    }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~>2.0"
+      version = "~>4.2.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -22,9 +18,11 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = var.az_subscription_id
   features {}
 }
 
-# # need env CLOUDFLARE_API_TOKEN
-# provider "cloudflare" {
-# }
+# need env CLOUDFLARE_API_TOKEN
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}

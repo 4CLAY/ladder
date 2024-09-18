@@ -16,6 +16,14 @@ variable "username" {
   default     = "azureadmin"
 }
 
-# variable "cloudflare_zone_id" {
-#   type        = string
-# }
+variable "cloudflare_api_token" {
+  type        = string
+}
+
+variable "cloudflare_zone_name" {
+  type = string
+}
+
+variable "az_subscription_id" {
+  type = string
+}

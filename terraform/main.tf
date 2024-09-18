@@ -29,6 +29,7 @@ resource "azurerm_public_ip" "labber_public_ip" {
   location            = azurerm_resource_group.labber_rg.location
   resource_group_name = azurerm_resource_group.labber_rg.name
   allocation_method   = "Dynamic"
+  sku = "Basic"
 }
 
 # Create Network Security Group and rule
@@ -36,7 +37,7 @@ resource "azurerm_network_security_group" "labber_nsg" {
   name                = "labber_network_security_group"
   location            = azurerm_resource_group.labber_rg.location
   resource_group_name = azurerm_resource_group.labber_rg.name
-
+  
   security_rule {
     name                       = "SSH"
     priority                   = 1001
@@ -48,7 +49,6 @@ resource "azurerm_network_security_group" "labber_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-
   security_rule {
     name                       = "HTTPS"
     priority                   = 1002
@@ -57,6 +57,28 @@ resource "azurerm_network_security_group" "labber_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "X_UI"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "2053"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -101,14 +123,18 @@ resource "azurerm_storage_account" "my_storage_account" {
   account_replication_type = "LRS"
 }
 
-# resource "cloudflare_record" "cf_record" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "labber"
-#   content = azurerm_public_ip.labber_public_ip.ip_address
-#   type    = "A"
-#   ttl     = 3600
-#   allow_overwrite = true
-# }
+data "cloudflare_zone" "zone" {
+  name = var.cloudflare_zone_name
+}
+
+resource "cloudflare_record" "cf_record" {
+  zone_id = data.cloudflare_zone.zone.id
+  name    = "labber"
+  content = azurerm_linux_virtual_machine.labber_vm.public_ip_address
+  type    = "A"
+  ttl     = 3600
+  allow_overwrite = true
+}
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "labber_vm" {
