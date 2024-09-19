@@ -96,12 +96,16 @@ resource "azurerm_network_interface" "labber_nic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.labber_public_ip.id
   }
+
+  depends_on = [ azurerm_subnet.labber_subnet, azurerm_public_ip.labber_public_ip ]
 }
 
 # Connect the security group to the network interface
 resource "azurerm_network_interface_security_group_association" "labber_nsg_association" {
   network_interface_id      = azurerm_network_interface.labber_nic.id
   network_security_group_id = azurerm_network_security_group.labber_nsg.id
+
+  depends_on = [ azurerm_network_interface.labber_nic, azurerm_network_security_group.labber_nsg ]
 }
 
 # Generate random text for a unique storage account name
@@ -165,5 +169,5 @@ resource "azurerm_linux_virtual_machine" "labber_vm" {
     public_key = file("~/.ssh/id_rsa.pub")
   }
 
-  custom_data = base64encode(file("${path.module}/userdata.sh"))
+  custom_data = base64encode(file("${path.module}/userdata.yaml"))
 }

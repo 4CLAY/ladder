@@ -1,5 +1,5 @@
 #cloud-config
-bootcmd:
+runcmd:
   - |
     sudo apt update -y
     sudo apt install -y curl socat sqlite
