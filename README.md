@@ -58,10 +58,6 @@ To get started with the ladder project, follow these steps:
    terraform apply
    ```
 
-## Monitoring and Maintenance
-
-To monitor the status of your nodes, consider integrating Azure Monitor or other monitoring tools. Regularly check the health of your nodes and apply updates as necessary using the established update mechanism.
-
 ## Disclaimer
 
 This project is for personal learning and communication purposes only. Please do not use it for illegal activities or in production environments.
