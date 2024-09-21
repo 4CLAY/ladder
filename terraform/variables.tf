@@ -48,7 +48,7 @@ variable "x_ui_port" {
 variable "x_ui_path" {
   type        = string
   description = "The path for the x-ui service."
-  default     = "/x-ui/"
+  default     = "x-ui"
 }
 
 variable "x_ui_username" {
