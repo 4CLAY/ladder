@@ -7,8 +7,8 @@ module "proxy-node" {
 
     x_ui_port = 5320
     x_ui_path = "x-ui"
-    x_ui_username = "labber"
-    x_ui_password = "labberasdfghjkl"
+    x_ui_username = "ladder"
+    x_ui_password = "ladderasdfghjkl"
 
     resource_group_location = "eastus"
     resource_group_name_prefix = "rg"

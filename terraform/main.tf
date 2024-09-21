@@ -1,42 +1,42 @@
-resource "random_pet" "labber_rg_name" {
+resource "random_pet" "ladder_rg_name" {
   prefix = var.resource_group_name_prefix
 }
 
-resource "azurerm_resource_group" "labber_rg" {
+resource "azurerm_resource_group" "ladder_rg" {
   location = var.resource_group_location
-  name     = random_pet.labber_rg_name.id
+  name     = random_pet.ladder_rg_name.id
 }
 
 # Create virtual network
-resource "azurerm_virtual_network" "labber_network" {
+resource "azurerm_virtual_network" "ladder_network" {
   name                = "${var.env_name}_vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.labber_rg.location
-  resource_group_name = azurerm_resource_group.labber_rg.name
+  location            = azurerm_resource_group.ladder_rg.location
+  resource_group_name = azurerm_resource_group.ladder_rg.name
 }
 
 # Create subnet
-resource "azurerm_subnet" "labber_subnet" {
+resource "azurerm_subnet" "ladder_subnet" {
   name                 = "${var.env_name}_subnet"
-  resource_group_name  = azurerm_resource_group.labber_rg.name
-  virtual_network_name = azurerm_virtual_network.labber_network.name
+  resource_group_name  = azurerm_resource_group.ladder_rg.name
+  virtual_network_name = azurerm_virtual_network.ladder_network.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 # Create public IPs
-resource "azurerm_public_ip" "labber_public_ip" {
+resource "azurerm_public_ip" "ladder_public_ip" {
   name                = "${var.env_name}_public_ip"
-  location            = azurerm_resource_group.labber_rg.location
-  resource_group_name = azurerm_resource_group.labber_rg.name
+  location            = azurerm_resource_group.ladder_rg.location
+  resource_group_name = azurerm_resource_group.ladder_rg.name
   allocation_method   = "Dynamic"
   sku                 = "Basic"
 }
 
 # Create Network Security Group and rule
-resource "azurerm_network_security_group" "labber_nsg" {
+resource "azurerm_network_security_group" "ladder_nsg" {
   name                = "${var.env_name}_network_security_group"
-  location            = azurerm_resource_group.labber_rg.location
-  resource_group_name = azurerm_resource_group.labber_rg.name
+  location            = azurerm_resource_group.ladder_rg.location
+  resource_group_name = azurerm_resource_group.ladder_rg.name
 
   security_rule {
     name                       = "SSH"
@@ -96,27 +96,27 @@ resource "azurerm_network_security_group" "labber_nsg" {
 }
 
 # Create network interface
-resource "azurerm_network_interface" "labber_nic" {
+resource "azurerm_network_interface" "ladder_nic" {
   name                = "${var.env_name}_NIC"
-  location            = azurerm_resource_group.labber_rg.location
-  resource_group_name = azurerm_resource_group.labber_rg.name
+  location            = azurerm_resource_group.ladder_rg.location
+  resource_group_name = azurerm_resource_group.ladder_rg.name
 
   ip_configuration {
     name                          = "${var.env_name}_nic_configuration"
-    subnet_id                     = azurerm_subnet.labber_subnet.id
+    subnet_id                     = azurerm_subnet.ladder_subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.labber_public_ip.id
+    public_ip_address_id          = azurerm_public_ip.ladder_public_ip.id
   }
 
-  depends_on = [azurerm_subnet.labber_subnet, azurerm_public_ip.labber_public_ip]
+  depends_on = [azurerm_subnet.ladder_subnet, azurerm_public_ip.ladder_public_ip]
 }
 
 # Connect the security group to the network interface
-resource "azurerm_network_interface_security_group_association" "labber_nsg_association" {
-  network_interface_id      = azurerm_network_interface.labber_nic.id
-  network_security_group_id = azurerm_network_security_group.labber_nsg.id
+resource "azurerm_network_interface_security_group_association" "ladder_nsg_association" {
+  network_interface_id      = azurerm_network_interface.ladder_nic.id
+  network_security_group_id = azurerm_network_security_group.ladder_nsg.id
 
-  depends_on = [azurerm_network_interface.labber_nic, azurerm_network_security_group.labber_nsg]
+  depends_on = [azurerm_network_interface.ladder_nic, azurerm_network_security_group.ladder_nsg]
 }
 
 data "cloudflare_zone" "zone" {
@@ -126,22 +126,22 @@ data "cloudflare_zone" "zone" {
 resource "cloudflare_record" "cf_record" {
   zone_id         = data.cloudflare_zone.zone.id
   name            = local.record_name
-  content         = azurerm_linux_virtual_machine.labber_vm.public_ip_address
+  content         = azurerm_linux_virtual_machine.ladder_vm.public_ip_address
   type            = "A"
   ttl             = 3600
   allow_overwrite = true
 }
 
 # Create virtual machine
-resource "azurerm_linux_virtual_machine" "labber_vm" {
+resource "azurerm_linux_virtual_machine" "ladder_vm" {
   name                  = "${var.env_name}_VM"
-  location              = azurerm_resource_group.labber_rg.location
-  resource_group_name   = azurerm_resource_group.labber_rg.name
-  network_interface_ids = [azurerm_network_interface.labber_nic.id]
+  location              = azurerm_resource_group.ladder_rg.location
+  resource_group_name   = azurerm_resource_group.ladder_rg.name
+  network_interface_ids = [azurerm_network_interface.ladder_nic.id]
   size                  = "Standard_B1s"
 
   os_disk {
-    name                 = "labberOsDisk"
+    name                 = "ladderOsDisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
     disk_size_gb         = 64

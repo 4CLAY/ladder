@@ -1,8 +1,8 @@
-# Labber
+# ladder
 
 ## Overview
 
-The **Labber** project aims to create an automated solution for deploying nodes using Terraform. This project is designed to simplify the process of setting up and managing infrastructure in a cloud environment, specifically targeting Azure.
+The **ladder** project aims to create an automated solution for deploying nodes using Terraform. This project is designed to simplify the process of setting up and managing infrastructure in a cloud environment, specifically targeting Azure.
 
 ## Objectives
 
@@ -24,12 +24,12 @@ The **Labber** project aims to create an automated solution for deploying nodes 
 
 ## Getting Started
 
-To get started with the Labber project, follow these steps:
+To get started with the ladder project, follow these steps:
 
 1. **Clone the Repository**: 
    ```bash
    git clone <repository-url>
-   cd labber
+   cd ladder
    ```
 
 2. **Install Terraform**: Ensure you have Terraform installed on your machine. You can download it from the [Terraform website](https://www.terraform.io/downloads.html).
@@ -68,7 +68,7 @@ This project is for personal learning and communication purposes only. Please do
 
 ## Conclusion
 
-The Labber project provides a robust framework for automating the deployment and management of cloud infrastructure. By leveraging Terraform, users can efficiently manage their resources while ensuring security and performance.
+The ladder project provides a robust framework for automating the deployment and management of cloud infrastructure. By leveraging Terraform, users can efficiently manage their resources while ensuring security and performance.
 
 For further information, please refer to the [Terraform documentation](https://www.terraform.io/docs/index.html) and the Azure documentation for specific services used in this project.
 
