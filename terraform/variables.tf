@@ -16,6 +16,11 @@ variable "username" {
   default     = "azureadmin"
 }
 
+variable "env_name" {
+  type        = string
+  description = "The name of the environment."
+}
+
 variable "cloudflare_api_token" {
   type        = string
 }
@@ -26,4 +31,32 @@ variable "cloudflare_zone_name" {
 
 variable "az_subscription_id" {
   type = string
+}
+
+variable "public_key_file" {
+  type        = string
+  description = "The public key to be used for SSH authentication."
+  default     = "~/.ssh/id_rsa.pub"
+}
+
+variable "x_ui_port" {
+  type        = number
+  description = "The port number for the x-ui service."
+  default     = 5320
+}
+
+variable "x_ui_path" {
+  type        = string
+  description = "The path for the x-ui service."
+  default     = "/x-ui/"
+}
+
+variable "x_ui_username" {
+  type        = string
+  description = "The username for the x-ui service."
+}
+
+variable "x_ui_password" {
+  type        = string
+  description = "The password for the x-ui service."
 }
