@@ -78,18 +78,7 @@ resource "azurerm_network_security_group" "ladder_nsg" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "2053"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "trojan_XTLS"
-    priority                   = 1005
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_range     = var.x_ui_port
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -107,16 +96,12 @@ resource "azurerm_network_interface" "ladder_nic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.ladder_public_ip.id
   }
-
-  depends_on = [azurerm_subnet.ladder_subnet, azurerm_public_ip.ladder_public_ip]
 }
 
 # Connect the security group to the network interface
 resource "azurerm_network_interface_security_group_association" "ladder_nsg_association" {
   network_interface_id      = azurerm_network_interface.ladder_nic.id
   network_security_group_id = azurerm_network_security_group.ladder_nsg.id
-
-  depends_on = [azurerm_network_interface.ladder_nic, azurerm_network_security_group.ladder_nsg]
 }
 
 data "cloudflare_zone" "zone" {
@@ -174,4 +159,40 @@ resource "azurerm_linux_virtual_machine" "ladder_vm" {
 locals {
   record_name = "${var.env_name}-proxy"
   hostname = "${local.record_name}.${var.cloudflare_zone_name}"
+}
+
+# Generate random text for a unique storage account name
+resource "random_id" "random_id" {
+  keepers = {
+    # Generate a new ID only when a new environment is created
+    resource_group = var.env_name
+  }
+  byte_length = 5
+}
+
+resource "azurerm_storage_account" "ladder_sa" {
+  name                     = "${var.env_name}sa${random_id.random_id.hex}"
+  resource_group_name      = azurerm_resource_group.ladder_rg.name
+  location                 = azurerm_resource_group.ladder_rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  public_network_access_enabled = true
+}
+
+resource "azurerm_storage_container" "ladder_container" {
+  name                  = "content"
+  storage_account_name  = azurerm_storage_account.ladder_sa.name
+  container_access_type = "container"
+}
+
+resource "azurerm_storage_blob" "clash" {
+  name                   = "clash.yaml"
+  storage_account_name   = azurerm_storage_account.ladder_sa.name
+  storage_container_name = azurerm_storage_container.ladder_container.name
+  type                   = "Block"
+  source_content         = templatefile("${path.module}/clash.yaml", 
+    {
+      host = local.hostname,
+    }
+  )
 }
